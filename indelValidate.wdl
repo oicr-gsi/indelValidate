@@ -14,9 +14,9 @@ workflow indelValidate {
 
 	parameter_meta {
 		normalbam: "normal input .bam file"
-		normalbam: "normal input .bai file"
+		normalbai: "normal input .bai file"
 		tumorbam: "tumor input .bam file"
-		tumorbam: "tumor input .bai file"
+		tumorbai: "tumor input .bai file"
 		chromosome: "chromosome on which the indel is"
 		indelid: "the number of the indel in the gene, in format of $gene_$num"
 		startPos: "start of indel position"
@@ -66,7 +66,7 @@ workflow indelValidate {
 		]
 		output_meta: {
 			imsindelOut: "List of validated indels in the window",
-			svabaIndelVCF: "Validated INDELS in .vcf format",
+			svabaIndelVCF: "Validated INDELS in .vcf format"
 		}
 	}
 	output {
@@ -141,7 +141,7 @@ task svaba {
 
 	meta {
 		output_meta: {
-			svabaIndelVCF: "Validated INDELS in .vcf format",
+			svabaIndelVCF: "Validated INDELS in .vcf format"
 		}
 	}
 }

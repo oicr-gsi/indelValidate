@@ -1,0 +1,32 @@
+## Commands
+This section lists the two parallel commands run by the indelValidate workflow: svaba and imsindel
+
+* Running svaba
+
+Svaba requires a .bed file (which we make by joining chromosome number with indel start and end positions (adjusted by 10bp).  Validation then requires tumor and normal bams, the bed file (for local reassembly) and the genome reference.
+
+
+
+		echo -e "~{chromosome}\t~{startPosAdj}\t~{endPosAdj}" > ~{tumorbam}.~{indelid}.bed
+
+		svaba run -a validate \
+			-p ~{threads} \
+			-G ~{reference} \
+			-t ~{tumorbam} \
+			-n ~{normalbam}  \
+			-k ~{tumorbam}.~{indelid}.bed 
+
+ * Running imsindel
+ 
+imsindel requires a .bam of just reads around the site, so we make that with samtools to include chromosome as well as start and end positions (adjusted by 5000bp) and index it. We then run imsindel with the tumorbam and the genome reference.   
+
+
+		samtools view -b ~{tumorbam} ~{chromosome}:~{startPosAdj}-~{endPosAdj} > ~{basename}.~{indelid}.bam
+		samtools index ~{basename}.~{indelid}.bam
+
+		imsindel --bam ~{basename}.~{indelid}.bam \
+			--chr ~{chromosome} \
+			--indelsize 10000 \
+			--reffa ~{reference} \
+			--temp temp/ \
+			--outd imsindelOutput/
