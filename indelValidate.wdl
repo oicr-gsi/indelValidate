@@ -1,6 +1,6 @@
 version 1.0
 
-workflow msisensor {
+workflow indelValidate {
 	input {
 		File normalbam
 		File normalbai
@@ -56,27 +56,21 @@ workflow msisensor {
 				url: "https://github.com/walaj/svaba"
 			},
 			{
-				name: "vep/1.6.17",
-				url: "https://useast.ensembl.org/info/docs/tools/vep/index.html"
-			},
-			{
 				name: "imsindel/1.0.2",
 				url: "https://github.com/NCGG-MGC/IMSindel"
 			},
 			{
-				name: "samtools/0.1.19",
+				name: "samtools/1.15",
 				url: "http://www.htslib.org/"
 			}
 		]
 		output_meta: {
-			imsindelOut: "List of validated indels in the window"
+			imsindelOut: "List of validated indels in the window",
 			svabaIndelVCF: "Validated INDELS in .vcf format",
-			svabaIndelMAF: "Validated INDELS, annotated by VEP, in .maf format"
 		}
 	}
 	output {
 		File svabaIndelVCF = "validate.svaba.somatic.indel.vcf"
-		File svabaIndelMAF = "~{tumorbam}.~{indelid}.maf"
 		File imsindelOut = "~{chromosome}.out"
 	}
 }
@@ -87,11 +81,9 @@ task svaba {
 		File tumorbam
 		File normalbai 
 		File tumorbai 
-		String modules = "svaba/1.1.0 hg38-bwa-index/0.7.17 vcf2maf/1.6.17 hg38/p12 vep-hg38-cache/92 vep-hg38-exac/0.3"
+		String modules = "svaba/1.1.0 hg38-bwa-index/0.7.17"
 		String basename = basename("~{tumorbam}", ".bam")
-		String reference = ~{HG38_BWA_INDEX_ROOT}/hg38_random.fa
-		String vepPath = ~{VEP_ROOT}/bin
-		String vepData = ~{VEP_HG38_CACHE_ROOT}/.vep
+		String reference = "$HG38_BWA_INDEX_ROOT/hg38_random.fa"
 		String chromosome
 		String indelid
 		Int startPos
@@ -111,8 +103,6 @@ task svaba {
 		basename: "Base name"
 		modules: "Required environment modules"
 		reference: "genome reference"
-		vepPath: "path to VEP"
-		vepData: "path to VEP data"
 		chromosome: "chromosome on which the indel is"
 		indelid: "the number of the indel in the gene, in format of $gene_$num"
 		startPos: "start of indel position"
@@ -136,12 +126,6 @@ task svaba {
 			-n ~{normalbam}  \
 			-k ~{tumorbam}.~{indelid}.bed 
 
-		~{VCF2MAF_ROOT}/bin/vcf2maf --species homo_sapiens  \
-			--ncbi-build GRCh38 --ref-fasta ~{reference} \
-			--vep-path ~{vepPath}  --vep-data ~{vepData}  \
-			--input-vcf validate.svaba.somatic.indel.vcf  \
-			--output-maf ~{tumorbam}.~{indelid}.maf 
-
 	>>>
 
 	runtime {
@@ -153,13 +137,11 @@ task svaba {
 
 	output {
 		File svabaIndelVCF = "validate.svaba.somatic.indel.vcf"
-		File svabaIndelMAF = "~{tumorbam}.~{indelid}.maf"
 	}
 
 	meta {
 		output_meta: {
 			svabaIndelVCF: "Validated INDELS in .vcf format",
-			svabaIndelMAF: "Validated INDELS, annotated by VEP, in .maf format"
 		}
 	}
 }
@@ -169,8 +151,8 @@ task imsindel {
 		File tumorbam
 		File tumorbai 
 		String basename = basename("~{tumorbam}", ".bam")
-		String modules = "samtools/0.1.19 imsindel/1.0.2 hg38-bwa-index/0.7.17"
-		String reference = ~{HG38_BWA_INDEX_ROOT}/hg38_random.fa
+		String modules = "samtools/1.15 imsindel/1.0.2 hg38-bwa-index/0.7.17"
+		String reference = "$HG38_BWA_INDEX_ROOT/hg38_random.fa"
 		String chromosome
 		String indelid
 		Int startPos
@@ -202,13 +184,21 @@ task imsindel {
 	command <<<
 		set -euo pipefail
 
-		samtools view -b tumorbam ~{chrom}:~{startPosAdj}-~{endPosAdj} > ~{tumorbam}.~{indelid}.bam
-		samtools index ~{tumorbam}.~{indelid}.bam
 
-		imsindel --bam ~{tumorbam}.~{indelid}.bam \
+
+		samtools view -b ~{tumorbam} ~{chromosome}:~{startPosAdj}-~{endPosAdj} > ~{basename}.~{indelid}.bam
+		samtools index ~{basename}.~{indelid}.bam
+
+		mkdir imsindelOutput
+		mkdir temp
+		imsindel --bam ~{basename}.~{indelid}.bam \
 			--chr ~{chromosome} \
 			--indelsize 10000 \
-			--reffa ~{reference}
+			--reffa ~{reference} \
+			--temp temp/ \
+			--outd imsindelOutput/
+
+		cp imsindelOutput/~{chromosome}.out ~{chromosome}.out
 
 	>>>
 
