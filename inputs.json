@@ -3,8 +3,8 @@
   "indelValidate.indelid": "CDKN2A_1",
   "indelValidate.startPos": "21971050",
   "indelValidate.endPos": "21971069",
-  "indelValidate.normalbai": "/.mounts/labs/CGI/scratch/fbeaudry/indelValidate_test/PANX_1333_Ly_R_WG_100-PM-040_BC.filter.deduped.realigned.recalibrated.bai",
-  "indelValidate.normalbam": "/.mounts/labs/CGI/scratch/fbeaudry/indelValidate_test/PANX_1333_Ly_R_WG_100-PM-040_BC.filter.deduped.realigned.recalibrated.bam",
-  "indelValidate.tumorbam": "/.mounts/labs/CGI/scratch/fbeaudry/indelValidate_test/PANX_1333_Lv_M_WG_100-PM-040_LCM3_6.filter.deduped.realigned.recalibrated.bam",
-  "indelValidate.tumorbai": "/.mounts/labs/CGI/scratch/fbeaudry/indelValidate_test/PANX_1333_Lv_M_WG_100-PM-040_LCM3_6.filter.deduped.realigned.recalibrated.bai"
+  "indelValidate.normalbai": "/.mounts/labs/gsi/testdata/indelValidate/test_inputs/CAPLOD_Test02.filter.deduped.realigned.recalibrated.bai",
+  "indelValidate.normalbam": "/.mounts/labs/gsi/testdata/indelValidate/test_inputs/CAPLOD_Test02.filter.deduped.realigned.recalibrated.bam",
+  "indelValidate.tumorbam": "/.mounts/labs/gsi/testdata/indelValidate/test_inputs/CAPLOD_Test01.filter.deduped.realigned.recalibrated.bam ",
+  "indelValidate.tumorbai": "/.mounts/labs/gsi/testdata/indelValidate/test_inputs/CAPLOD_Test01.filter.deduped.realigned.recalibrated.bai"
 }
